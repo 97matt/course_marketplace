@@ -1,0 +1,22 @@
+>>> backend:
+
+- express
+- dotenv
+- cors
+- pg
+- morgan
+- bcrypt
+- jsonwebtoken
+- nodemon
+- jest
+
+>>> frontend
+
+- react
+- react-dom
+- react-router-dom 
+- react-scripts
+- react-bootstrap
+- @mui/material
+- bootstrap
+- axios

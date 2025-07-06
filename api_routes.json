@@ -1,0 +1,279 @@
+[
+    [
+        {
+            "method": "POST",
+            "endpoint": "/api/users",
+            "description": "Create a new user",
+            "request": {
+                "content-type": "application/json",
+                "body": {
+                    "user_name": "string",
+                    "user_first_name": "string",
+                    "user_last_name": "string",
+                    "user_email": "string",
+                    "user_password": "string",
+                    "user_rol": "string",
+                    "user_img": "string"
+                }
+            },
+            "response": {
+                "201": {
+                    "description": "User created successfully",
+                    "body": {
+                        "user_id": "string",
+                        "user_name": "string",
+                        "user_first_name": "string",
+                        "user_last_name": "string",
+                        "user_email": "string",
+                        "user_rol": "string",
+                        "user_img": "string"
+                    }
+                },
+                "400": {
+                    "description": "Invalid input"
+                }
+            }
+        },
+        {
+            "method": "GET",
+            "endpoint": "/api/users",
+            "description": "Get list of all users",
+            "response": {
+                "200": {
+                    "description": "A list of users",
+                    "body": {
+                        "user_id": "string",
+                        "user_name": "string",
+                        "user_first_name": "string",
+                        "user_last_name": "string",
+                        "user_email": "string",
+                        "user_rol": "string",
+                        "user_img": "string"
+                    }
+                },
+                "400": {
+                    "description": "Error getting users"
+                }
+            }
+        },
+        {
+            "method": "GET",
+            "endpoint": "/api/users/{id}",
+            "description": "Get user by ID",
+            "response": {
+                "200": {
+                    "description": "A user by ID",
+                    "body": {
+                        "user_id": "string",
+                        "user_name": "string",
+                        "user_first_name": "string",
+                        "user_last_name": "string",
+                        "user_email": "string",
+                        "user_rol": "string",
+                        "user_img": "string"
+                    }
+                },
+                "400": {
+                    "description": "Error getting user"
+                },
+                "404": {
+                    "description": "User not found"
+                }
+            }
+        },
+        {
+            "method": "PUT",
+            "endpoint": "/api/users/{id}",
+            "description": "Update user by ID",
+            "request": {
+                "content-type": "application/json",
+                "body": {
+                    "user_name": "string",
+                    "user_first_name": "string",
+                    "user_last_name": "string",
+                    "user_email": "string",
+                    "user_rol": "string",
+                    "user_img": "string"
+                }
+            },
+            "response": {
+                "200": {
+                    "description": "User successfully updated",
+                    "body": {
+                        "user_id": "string",
+                        "user_name": "string",
+                        "user_first_name": "string",
+                        "user_last_name": "string",
+                        "user_email": "string",
+                        "user_rol": "string",
+                        "user_img": "string"
+                    }
+                },
+                "400": {
+                    "description": "Error updating user"
+                },
+                "404": {
+                    "description": "User not found"
+                }
+            }
+        },
+        {
+            "method": "DELETE",
+            "endpoint": "/api/users/{id}",
+            "description": "Delete user by ID",
+            "response": {
+                "204": {
+                    "description": "User successfully deleted"
+                },
+                "400": {
+                    "description": "Error deleting user"
+                },
+                "404": {
+                    "description": "User not found"
+                }
+            }
+        }
+    ],
+    [
+        {
+            "method": "POST",
+            "endpoint": "/api/courses",
+            "description": "Create a new course",
+            "request": {
+                "content-type": "application/json",
+                "body": {
+                    "course_title": "string",
+                    "course_professor": "string",
+                    "course_category": "string",
+                    "course_description": "string",
+                    "course_price": "number",
+                    "course_start_date": "string",
+                    "course_img": "string"
+                }
+            },
+            "response": {
+                "201": {
+                    "description": "Course created successfully",
+                    "body": {
+                    "course_id": "string",
+                    "course_title": "string",
+                    "course_professor": "string",
+                    "course_category": "string",
+                    "course_description": "string",
+                    "course_price": "number",
+                    "course_start_date": "string",
+                    "course_img": "string"
+                    }
+                },
+                "400": {
+                    "description": "Invalid input"
+                }
+            }
+        },
+        {
+            "method": "GET",
+            "endpoint": "/api/courses",
+            "description": "Get list of all courses",
+            "response": {
+                "200": {
+                    "description": "A list of all courses",
+                    "body": [
+                        {
+                        "course_id": "string",
+                        "course_title": "string",
+                        "course_professor": "string",
+                        "course_category": "string",
+                        "course_description": "string",
+                        "course_price": "number",
+                        "course_start_date": "string",
+                        "course_img": "string"
+                        }
+                    ]
+                },
+                "400": {
+                    "description": "Error getting courses"
+                }
+            }
+        },
+        {
+            "method": "GET",
+            "endpoint": "/api/courses/{id}",
+            "description": "Get course by ID",
+            "response": {
+                "200": {
+                    "description": "A course by ID",
+                    "body": {
+                        "course_id": "string",
+                        "course_title": "string",
+                        "course_professor": "string",
+                        "course_category": "string",
+                        "course_description": "number",
+                        "course_price": "boolean",
+                        "course_start_date": "string",
+                        "course_img": "string"
+                    }
+                },
+                "400": {
+                    "description": "Error getting course"
+                },
+                "404": {
+                    "description": "Course not found"
+                }
+            }
+        },
+        {
+            "method": "PUT",
+            "endpoint": "/api/courses/{id}",
+            "description": "Update course by ID",
+            "request": {
+                "content-type": "application/json",
+                "body": {
+                    "course_title": "string",
+                    "course_professor": "string",
+                    "course_category": "string",
+                    "course_description": "number",
+                    "course_price": "boolean",
+                    "course_start_date": "string",
+                    "course_img": "string"
+                }
+            },
+            "response": {
+                "200": {
+                    "description": "Course successfully updated",
+                    "body": {
+                        "course_id": "string",
+                        "course_title": "string",
+                        "course_professor": "string",
+                        "course_category": "string",
+                        "course_description": "number",
+                        "course_price": "boolean",
+                        "course_start_date": "string",
+                        "course_img": "string"
+                        }
+                },
+                "400": {
+                    "description": "Error updating course"
+                },
+                "404": {
+                    "description": "course not found"
+                }
+            }
+        },
+        {
+            "method": "DELETE",
+            "endpoint": "/api/courses/{id}",
+            "description": "Delete course by ID",
+            "response": {
+                "204": {
+                    "description": "Course successfully deleted"
+                },
+                "400": {
+                    "description": "Error deleting course"
+                },
+                "404": {
+                    "description": "Course not found"
+                }
+            }
+        }
+    ]
+]
