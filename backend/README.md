@@ -121,6 +121,14 @@ Respuesta:
 { "message": "Access granted!" }
 
 
+🔹 Ver cursos en los que estoy inscrito
+GET /enroll/my-courses
+
+Auth: Token Bearer (estudiante)
+
+Respuesta: Arreglo de cursos en los que el estudiante autenticado está inscrito.
+
+
 En todas las rutas protegidas, enviar:
 Authorization: Bearer <token>
 

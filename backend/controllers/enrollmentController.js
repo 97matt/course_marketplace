@@ -70,7 +70,37 @@ const unenrollFromCourse = async (req, res) => {
 
 
 
+// Obtener todos los cursos en los que un estudiante esta inscrito
+const getStudentCourses = async (req, res) => {
+    try {
+        const userId = req.user.userId
+        const role = req.user.role
+
+        // Solo estudiantes pueden acceder la ruta
+        if (role !== 'student') {
+            return res.status(403).json({ error: 'Access denied. Only students can view enrolled courses' })
+        }
+
+        // Obtener los ID's de cursos en los que el estudiante esta inscrito
+        const enrollmentQuery = `
+            SELECT c.*
+            FROM user_course uc
+            JOIN courses c ON uc.course_id = c.course_id
+            WHERE uc.user_id = $1
+        `
+        const result = await db.query(enrollmentQuery, [userId])
+
+        res.json({ courses: result.rows })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: 'Error fetching enrolled courses' })
+    }
+}
+
+
+
 module.exports = {
     enrollInCourse,
     unenrollFromCourse,
+    getStudentCourses,
 }
