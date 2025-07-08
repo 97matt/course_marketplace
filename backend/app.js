@@ -44,6 +44,16 @@ app.use('/api/enroll', enrollmentRoutes)
 //     })
 // })
 
+app.get('/test-db', async (req, res) => {
+    try {
+        const result = await db.query('SELECT NOW()');
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error('❌ DB error:', err.message);
+        res.status(500).json({ error: 'Database connection failed' });
+    }
+});
+
 app.get('/', (req, res) => {
     res.send('API is running...')
 })
