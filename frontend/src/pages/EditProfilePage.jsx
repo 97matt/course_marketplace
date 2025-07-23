@@ -2,21 +2,21 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import NavBarComponent from "../components/NavBarComponent";
 import { useAuth } from "../context/AuthContext";
+import { updateUserRequest } from "../api/users"
 
 export default function RegisterPage() {
-    const [formData, setFormData] = useState({
-        user_name: "",
-        user_first_name: "",
-        user_last_name: "",
-        user_email: "",
-        user_password: "",
-        user_rol: "student",
-        user_img: "....//" // ********* debemos cambiar esto
-    });
-
-    const { signup } = useAuth(); // corregido
-    const navigate = useNavigate(); // corregido
+    const navigate = useNavigate();
+    const { user, setUser } = useAuth();
     const [error, setError] = useState(null);
+    const [formData, setFormData] = useState({
+        user_id: user.user_id,
+        user_name: user.user_name,
+        user_first_name: user.user_first_name,
+        user_last_name: user.user_last_name,
+        user_email: user.user_email,
+        user_rol: user.user_rol,
+        user_img: "....//"
+    });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -26,11 +26,14 @@ export default function RegisterPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await signup(formData);
+            //await signup(formData);
+            const update = await updateUserRequest(formData)
+            setError("");
+            setUser(update.data.user);
             navigate("/profile");
         } catch (err) {
             console.log(err);
-            setError("Error al registrarse. Intenta nuevamente.");
+            setError("Contraseña erronea");
         }
     };
 
@@ -94,17 +97,18 @@ export default function RegisterPage() {
                     className="form-select mb-3"
                     value={formData.user_rol}
                     onChange={handleChange}
+                    disabled
                 >
                     <option value="student">Student</option>
                     <option value="professor">Professor</option>
                 </select>
 
                 <div className="d-flex justify-content-between">
-                    <Link to="/login" className="btn btn-outline-secondary">
+                    <Link to="/prefile" className="btn btn-outline-secondary">
                         Cancelar
                     </Link>
                     <button type="submit" className="btn btn-success">
-                        Registrar
+                        Actualizar
                     </button>
                 </div>
             </form>

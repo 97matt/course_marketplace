@@ -1,7 +1,10 @@
 const jwt = require('jsonwebtoken')
 
 const authMiddleware = (req, res, next) => {
-    const authHeader = req.headers.authorization
+    console.log(req.headers)
+    console.log(">>>>>>>> cookis: ", req.headers.cookie)
+    console.log(">>>>>>>> authorization: ", req.headers.authorization)
+    const authHeader = req.headers.cookie
 
     // 1) Check if Authorization header is present
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -13,7 +16,7 @@ const authMiddleware = (req, res, next) => {
     try {
         // 3) Verify the token with your secret 
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        
+
         // 4) Attach user info to the request object
         req.user = decoded
 

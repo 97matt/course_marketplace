@@ -2,13 +2,19 @@ const db = require('../models/db')
 
 
 const createCourse = async (req, res) => {
+    console.log('<>>>>><<<<>>>><><>><<<>>', req.body)
+
+    ">>>>>>> MODIFIQUE EL USER ROLE VALIDACION 1 "
+
     try {
+        const { course_title, course_category, course_description, course_price, course_start_date, course_img, course_professor_id, course_professor_rol } = req.body
         // 1) Check if the logged-in user is a teacher
-        if (req.user.role !== 'teacher') {
+        /////// (req.user.role !== 'teacher')
+        if (course_professor_rol !== 'professor') {
             return res.status(403).json({ error: 'Only teachers can create courses' })
         }
         // 2) Get course details from the request body
-        const { course_title, course_category, course_description, course_price, course_start_date, course_img } = req.body
+
         // 3) Validate required fields
         if (!course_title || !course_description || !course_price) {
             return res.status(400).json({ error: 'Missing course fields' })
@@ -23,7 +29,7 @@ const createCourse = async (req, res) => {
         `
         const values = [
             course_title,
-            req.user.userId,    // course_professor: ID of the teacher creating the course
+            course_professor_id,    // >>>>>>>>>>>>>>> AH course_professor: ID of the teacher creating the course
             course_category,
             course_description,
             course_price,
@@ -41,21 +47,16 @@ const createCourse = async (req, res) => {
     }
 }
 
-
-
-const getAllCourses = async (req,res) => {
+const getAllCourses = async (req, res) => {
     try {
         const query = 'SELECT * FROM courses ORDER BY course_id DESC'
         const result = await db.query(query)
-
         res.json(result.rows)
     } catch (error) {
         console.error(error)
         res.status(500).json({ error: 'Error retrieving courses' })
     }
 }
-
-
 
 const getCourseById = async (req, res) => {
     const { id } = req.params
@@ -75,6 +76,23 @@ const getCourseById = async (req, res) => {
     }
 }
 
+const getCoursesByIdProfessor = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const query = 'SELECT * FROM courses WHERE course_professor = $1';
+        const result = await db.query(query, [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Courses not found' });
+        }
+
+        res.json(result.rows); // <-- devolver todos los cursos
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error retrieving courses' });
+    }
+};
 
 
 const deleteCourse = async (req, res) => {
@@ -107,11 +125,10 @@ const deleteCourse = async (req, res) => {
     }
 }
 
-
-
 module.exports = {
     createCourse,
     getAllCourses,
     getCourseById,
     deleteCourse,
+    getCoursesByIdProfessor
 }

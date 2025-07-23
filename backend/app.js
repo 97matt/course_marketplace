@@ -1,4 +1,3 @@
-// Import core modules using CommonJS syntax
 const express = require('express')
 const dotenv = require('dotenv')
 const cors = require('cors')
@@ -9,40 +8,26 @@ const courseRoutes = require('./routes/courseRoutes')
 const enrollmentRoutes = require('./routes/enrollmentRoutes')
 const authMiddleware = require('./middleware/authMiddleware')
 
-// Load environment variables from .env
+const cookieParser = require("cookie-parser");
+
 dotenv.config()
 
 // Initialize Express app
 const app = express()
 
+app.use(cookieParser());
+
 // Middleware
-app.use(cors())                    // Habilitar CORS para que se comuniquen el front con el back
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}));                   // Habilitar CORS para que se comuniquen el front con el back
 app.use(morgan('dev'))      // HTTP request logger
 app.use(express.json())      // Parse incoming JSON payloads
 
-app.use('/api/users', userRoutes)
-app.use('/api/courses', courseRoutes)
-app.use('/api/enroll', enrollmentRoutes)
-
-// Test routes
-// Test acceso a db
-// app.get('/test-db', async (req, res) => {
-//     try {
-//         const result = await db.query('SELECT NOW()')
-//         res.json({ dbTime: result.rows[0] })
-//     } catch (error) {
-//         console.error(error)
-//         res.status(500).json({ error: 'Database connection failed' })
-//     }
-// })
-
-//Protected route to test middleware token verification
-// app.get('/api/protected', authMiddleware, (req, res) => {
-//     res.json({
-//         message: 'Access granted to protected route!',
-//         user: req.user
-//     })
-// })
+app.use('/api/users', userRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/enroll', enrollmentRoutes);
 
 app.get('/test-db', async (req, res) => {
     try {
@@ -61,5 +46,5 @@ app.get('/', (req, res) => {
 // Start Server
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
-    console.log(`Sever corriendo en puerto ${PORT}`)
+    console.log(`Server corriendo en puerto ${PORT}`)
 })

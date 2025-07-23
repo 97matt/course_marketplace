@@ -1,10 +1,11 @@
 const express = require('express')
 const router = express.Router()
-const { createCourse, getAllCourses, getCourseById, deleteCourse } = require('../controllers/courseController')
+const { createCourse, getAllCourses, getCourseById, deleteCourse, getCoursesByIdProfessor } = require('../controllers/courseController')
 const authMiddleware = require('../middleware/authMiddleware')
 
 // Route for teachers to create a new course
-router.post('/', authMiddleware, createCourse)
+//////>>>>>>>>>>>>>     QUITE EL TOKEN
+router.post('/', createCourse)
 
 // Route to get all courses
 router.get('/', getAllCourses)
@@ -14,5 +15,8 @@ router.get('/:id', getCourseById)
 
 // Route to delete course
 router.delete('/:id', authMiddleware, deleteCourse)
+
+//////// AH >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+router.get('/professor/:id', getCoursesByIdProfessor)
 
 module.exports = router

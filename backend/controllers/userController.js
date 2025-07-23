@@ -6,12 +6,13 @@ const jwt = require('jsonwebtoken')
 // Register User
 const registerUser = async (req, res) => {
     const { user_name, user_first_name, user_last_name, user_email, user_password, user_rol, user_img } = req.body
+    console.log(user_name, user_first_name, user_last_name, user_email, user_password, user_rol, user_img)
     try {
         // 1) Validate required fields
-        if (!user_name || !user_first_name || !user_last_name || !user_email || !user_password || !user_rol) {
+        /*if (!user_name || !user_first_name || !user_last_name || !user_email || !user_password || !user_rol) {
             return res.status(400).json({ error: 'Missing required fields' })
         }
-        // 2) Hash the password for security
+        // 2) Hash the password for security*/
         const hashedPassword = await bcrypt.hash(user_password, 10)
         // 3) Insert the new user into the database
         const query = `
@@ -30,7 +31,6 @@ const registerUser = async (req, res) => {
         res.status(500).json({ error: 'Error registering user' })
     }
 }
-
 
 // Login User
 const loginUser = async (req, res) => {
@@ -54,13 +54,25 @@ const loginUser = async (req, res) => {
         }
         // 4) Create JWT token
         const tokenPayload = { userId: user.user_id, role: user.user_rol }
-        const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '2h' })
+        const token = jwt.sign(tokenPayload, 'process.env.JWT_SECRET', { expiresIn: '2h' })
         // 5) Return token and basic user info
+
+
+        //>>>>>  agrege esto ALFREDO
+        res.cookie("token", token, {
+            httpOnly: true,           // 🔒 No accesible desde JS
+            secure: false,            // true en producción con HTTPS
+            sameSite: "Lax",          // "None" si frontend y backend están en dominios distintos
+            maxAge: 2 * 60 * 60 * 1000 // 2 horas
+        });
+
         res.json({
             token,
             user: {
                 user_id: user.user_id,
                 user_name: user.user_name,
+                user_first_name: user.user_first_name,
+                user_last_name: user.user_last_name,
                 user_email: user.user_email,
                 user_rol: user.user_rol,
             }
@@ -71,78 +83,81 @@ const loginUser = async (req, res) => {
     }
 }
 
-
-// Update User
-const updateUser = async(req, res) => {
-    const { id } = req.params
-    const { user_name, user_first_name, user_last_name, user_email, user_password, user_img } = req.body
+const updateUser = async (req, res) => {
+    const {
+        user_id,
+        user_name,
+        user_first_name,
+        user_last_name,
+        user_email,
+        user_password,
+        user_password_new,
+        user_img
+    } = req.body;
 
     try {
-        // 1) Make sure user making request matches profile being updated
-        if (parseInt(id) !== req.user.userId) {
-            return res.status(403).json({ error: 'Unauthroized to update this profile' })
-        }
-        // 2) Check for existing username (if changed)
-        if (user_name) {
-            const usernameQuery = 'SELECT * FROM users WHERE user_name = $1 AND user_id != $2'
-            const usernameResult = await db.query(usernameQuery, [user_name, id])
-            if (usernameResult.rows.length > 0) {
-                return res.status(400).json({ error: 'Username already taken' })
-            }
-        }
-        // 3) Check for existing email (if changed)
-        if (user_email) {
-            const emailQuery = 'SELECT * FROM users WHERE user_email = $1 and user_id != $2'
-            const emailResult = await db.query(emailQuery, [user_email, id])
-            if (emailResult.rows.length > 0) {
-                return res.status(400).json({ error: 'Email already taken' })
-            }
-        }
-        // 4) Prepare fields and values to update
-        const fields = []
-        const values = []
-        let idx = 1
+        // 1. Buscar usuario
+        const result = await db.query('SELECT * FROM users WHERE user_id = $1', [user_id]);
 
-        if (user_name) {
-            fields.push(`user_name = $${idx++}`)
-            values.push(user_name)
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
         }
-        if (user_first_name) {
-            fields.push(`user_first_name = $${idx++}`)
-            values.push(user_first_name)
-        }
-        if (user_last_name) {
-            fields.push(`user_last_name = $${idx++}`)
-            values.push(user_email)
-        }
-        if (user_email) {
-            fields.push(`user_email = $${idx++}`)
-            values.push(user_email)
-        }
-        if (user_password) {
-            const hashedPassword = await bcrypt.hash(user_password, 10)
-            fields.push(`user_password = $${idx++}`)
-            values.push(hashedPassword)
-        }
-        if (user_img) {
-            fields.push(`user_img = $${idx++}`)
-            values.push(user_img)
-        }
-        if (fields.length === 0) {
-            return res.status(400).json({ error: 'No fields to update' })
-        }
-        // 5) Build and run update query
-        const query = `UPDATE users SET ${fields.join(', ')} WHERE user_id = $${idx} RETURNING user_id, user_name, user_first_name, user_last_name, user_email, user_rol, user_img`
-        values.push(id)
 
-        const result = await db.query(query, values)
+        const user = result.rows[0];
 
-        res.json(result.rows[0])
+        // 2. Verificar contraseña actual
+        const isValidPassword = await bcrypt.compare(user_password, user.user_password);
+
+        if (!isValidPassword) {
+            return res.status(401).json({ error: 'Contraseña actual inválida' });
+        }
+
+        // 3. Determinar si se debe actualizar la contraseña
+        let hashedPassword = user.user_password; // mantener la actual por defecto
+
+        if (user_password_new && user_password_new.trim() !== '') {
+            // hashear la nueva contraseña
+            const salt = await bcrypt.genSalt(10);
+            hashedPassword = await bcrypt.hash(user_password_new, salt);
+        }
+
+        // 4. Ejecutar la actualización
+        const updateQuery = `
+      UPDATE users SET
+        user_name = $1,
+        user_first_name = $2,
+        user_last_name = $3,
+        user_email = $4,
+        user_password = $5,
+        user_img = $6
+      WHERE user_id = $7
+      RETURNING *;
+    `;
+
+        const values = [
+            user_name,
+            user_first_name,
+            user_last_name,
+            user_email,
+            hashedPassword,
+            user_img,
+            user_id
+        ];
+
+        const updatedUser = await db.query(updateQuery, values);
+        console.log(updatedUser.rows[0])
+
+        res.status(200).json({
+            message: 'Perfil actualizado exitosamente',
+            user: updatedUser.rows[0]
+        });
+
     } catch (error) {
-        console.error(error)
-        res.status(500).json({ error: 'Error updating profile' })
+        console.error(error);
+        res.status(500).json({ error: 'Error al actualizar el perfil' });
     }
-}
+};
+
 
 
 module.exports = {
