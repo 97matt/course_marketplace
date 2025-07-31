@@ -15,7 +15,9 @@ export default function RegisterPage() {
         user_last_name: user.user_last_name,
         user_email: user.user_email,
         user_rol: user.user_rol,
-        user_img: "....//"
+        user_img: "....//",
+        user_password: "",
+        new_password: ""
     });
 
     const handleChange = (e) => {
@@ -27,7 +29,7 @@ export default function RegisterPage() {
         e.preventDefault();
         try {
             //await signup(formData);
-            const update = await updateUserRequest(formData)
+            const update = await updateUserRequest(formData.user_id, formData)
             setError("");
             setUser(update.data.user);
             navigate("/profile");
@@ -91,6 +93,14 @@ export default function RegisterPage() {
                     value={formData.user_password}
                     onChange={handleChange}
                     required
+                />
+                <input
+                    type="password"
+                    className="form-control mb-2"
+                    placeholder="Nuevo password (opcional)"
+                    name="new_password"
+                    value={formData.new_password}
+                    onChange={handleChange}
                 />
                 <select
                     name="user_rol"

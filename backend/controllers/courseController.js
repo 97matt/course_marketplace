@@ -1,4 +1,5 @@
 const db = require('../models/db')
+const { pool } = require('../models/db')
 
 
 const createCourse = async (req, res) => {
@@ -49,8 +50,25 @@ const createCourse = async (req, res) => {
 
 const getAllCourses = async (req, res) => {
     try {
-        const query = 'SELECT * FROM courses ORDER BY course_id DESC'
-        const result = await db.query(query)
+        const query = `
+            SELECT 
+                c.course_id,
+                c.course_title,
+                c.course_category,
+                c.course_description,
+                c.course_price,
+                c.course_start_date,
+                c.course_img,
+                c.course_professor,
+
+                u.user_first_name AS professor_first_name,
+                u.user_last_name AS professor_last_name
+
+            FROM courses c
+            LEFT JOIN users u ON c.course_professor = u.user_id
+            ORDER BY c.course_id DESC
+        `;
+        const result = await db.query(query);
         res.json(result.rows)
     } catch (error) {
         console.error(error)
@@ -62,7 +80,24 @@ const getCourseById = async (req, res) => {
     const { id } = req.params
 
     try {
-        const query = 'SELECT * FROM courses WHERE course_id = $1'
+        const query = `
+            SELECT 
+                c.course_id,
+                c.course_title,
+                c.course_category,
+                c.course_description,
+                c.course_price,
+                c.course_start_date,
+                c.course_img,
+                c.course_professor,
+
+                u.user_first_name AS professor_first_name,
+                u.user_last_name AS professor_last_name
+
+        FROM courses c
+        LEFT JOIN users u ON c.course_professor = u.user_id
+        WHERE c.course_id = $1
+    `;
         const result = await db.query(query, [id])
 
         if (result.rows.length === 0) {
@@ -77,22 +112,40 @@ const getCourseById = async (req, res) => {
 }
 
 const getCoursesByIdProfessor = async (req, res) => {
-    const { id } = req.params;
-
+    const { id } = req.params
     try {
-        const query = 'SELECT * FROM courses WHERE course_professor = $1';
-        const result = await db.query(query, [id]);
+        const query = `
+            SELECT 
+                c.course_id,
+                c.course_title,
+                c.course_category,
+                c.course_description,
+                c.course_price,
+                c.course_start_date,
+                c.course_img,
+                c.course_professor AS professor_id,
+
+                u.user_first_name AS professor_first_name,
+                u.user_last_name AS professor_last_name
+
+            FROM courses c
+            LEFT JOIN users u ON c.course_professor = u.user_id
+            WHERE c.course_professor = $1
+            ORDER BY c.course_id DESC
+        `
+
+        const result = await db.query(query, [id])
 
         if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'Courses not found' });
+            return res.status(404).json({ error: 'Courses not found' })
         }
 
-        res.json(result.rows); // <-- devolver todos los cursos
+        res.json(result.rows); // Return all courses with full info
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error retrieving courses' });
+        console.error(error)
+        res.status(500).json({ error: 'Error retrieving courses' })
     }
-};
+}
 
 
 const deleteCourse = async (req, res) => {
@@ -125,10 +178,111 @@ const deleteCourse = async (req, res) => {
     }
 }
 
+
+//Get filtered & paginated courses
+const getFilteredCourses = async (req, res) => {
+	try {
+		const client = await pool.connect();
+		console.log("🔥 Connected to DB");
+
+		const {
+			category,
+			min_price,
+			max_price,
+			page = 1,
+			limit = 3,
+		} = req.query;
+
+		console.log("📦 Query params:", req.query);
+
+		const conditions = [];
+		const values = [];
+
+        if (category && category !== "") {
+            values.push(category);
+            conditions.push(`LOWER(course_category) = LOWER($${values.length})`);
+        }
+
+		if (min_price) {
+			values.push(parseFloat(min_price));
+			conditions.push(`course_price >= $${values.length}`);
+		}
+
+		if (max_price) {
+			values.push(parseFloat(max_price));
+			conditions.push(`course_price <= $${values.length}`);
+		}
+
+		const whereClause =
+			conditions.length > 0 ? "WHERE " + conditions.join(" AND ") : "";
+
+		const offset = (parseInt(page) - 1) * parseInt(limit);
+		values.push(parseInt(limit));
+		values.push(offset);
+
+        const courseQuery = `
+            SELECT 
+                c.*, 
+                u.user_first_name AS professor_first_name,
+                u.user_last_name AS professor_last_name
+            FROM courses c
+            LEFT JOIN users u ON c.course_professor = u.user_id
+            ${whereClause}
+            ORDER BY c.course_id
+            LIMIT $${values.length - 1} OFFSET $${values.length};
+        `;
+
+            console.log("🟡 Final WHERE clause:", whereClause);
+            console.log("🔵 Filter values:", values);
+            console.log("🧠 Final SQL:", courseQuery);
+
+
+
+        const totalQuery = `
+            SELECT COUNT(*) FROM courses c
+            LEFT JOIN users u ON c.course_professor = u.user_id
+            ${whereClause};
+        `;
+
+
+		console.log("🧠 Final SQL:", courseQuery);
+		console.log("🧠 Final values:", values);
+
+		let courseResult, totalResult;
+
+		try {
+			[courseResult, totalResult] = await Promise.all([
+				client.query(courseQuery, values),
+				client.query(totalQuery, values.slice(0, values.length - 2)),
+			]);
+            console.log("📘 Course results:", courseResult.rows);
+            
+		} catch (sqlError) {
+			console.error("❌ SQL EXECUTION ERROR:", sqlError);
+			return res.status(500).json({ error: "SQL query failed" });
+		}
+
+		client.release();
+		console.log("✅ Queries executed, returning result");
+
+		res.json({
+			courses: courseResult.rows,
+			total: parseInt(totalResult.rows[0].count),
+		});
+	} catch (err) {
+		console.error("❌ OUTER ERROR:", err);
+		res.status(500).json({ error: "Server error fetching courses" });
+	}
+};
+
+
+
+
 module.exports = {
     createCourse,
     getAllCourses,
     getCourseById,
     deleteCourse,
-    getCoursesByIdProfessor
+    getCoursesByIdProfessor,
+    getFilteredCourses
 }

@@ -1,9 +1,31 @@
+import { useEffect, useState } from "react";
+import { getTopLikedCoursesRequest } from "../api/likes";
+import { useAuth } from "../context/AuthContext";
+
 import CourseComponent from "../components/CourseComponent";
 import NavBarComponent from "../components/NavBarComponent";
 import FooterComponent from "../components/FooterComponent";
 import imagenCurso from "../../public/assets/students.jpg";
 
 export default function HomePage() {
+    //Initialize with empty array
+    const [topCourses, setTopCourses] = useState([])
+    const { user } = useAuth()
+
+    //Fetch top liked courses
+    useEffect(() => {
+        const fetchTopCourses = async () => {
+            try {
+                const res = await getTopLikedCoursesRequest()
+                setTopCourses(res.data) //Returns 3 courses
+            } catch (error) {
+                console.error("Error fetching top liked courses", error.message)
+            }
+        }
+
+        fetchTopCourses()
+    }, [])
+
     return (
         <>
             <NavBarComponent />
@@ -27,23 +49,29 @@ export default function HomePage() {
                 </div>
             </div>
 
-            <div className="row m-auto mb-5">
-                <div className="col-12 p-3">
-                    <h2 className="text-center h3">Cursos mas populares</h2>
-                </div>
-                <div className="col-3">
-                    <CourseComponent />
-                </div>
-                <div className="col-3">
-                    <CourseComponent />
-                </div>
-                <div className="col-3">
-                    <CourseComponent />
-                </div>
-                <div className="col-3">
-                    <CourseComponent />
-                </div>
+        {/* Cursos mas populares section */}
+        <div className="row m-auto mb-t">
+            <div className="col-12 p-3">
+                <h2 className="text-center h3">Cursos mas populares</h2>
             </div>
+
+            {/* Render top 3 dynamically once loaded */}
+            {topCourses.length === 3 && (
+                <div className="d-flex justify-content-center gap-4 my-4">
+                    <div className="col-md-3">
+                        <CourseComponent course={topCourses[1]} user_rol={user?.user_rol} user_id={user?.user_id} />
+                    </div>
+                    <div className="col-md-3">
+                        <CourseComponent course={topCourses[0]} user_rol={user?.user_rol} user_id={user?.user_id} />
+                    </div>
+                    <div className="col-md-3">
+                        <CourseComponent course={topCourses[2]} user_rol={user?.user_rol} user_id={user?.user_id} />
+                    </div>
+                </div>
+            )}
+        </div>
+        
+
             <FooterComponent />
         </>
     )

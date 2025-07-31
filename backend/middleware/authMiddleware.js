@@ -1,10 +1,7 @@
 const jwt = require('jsonwebtoken')
 
 const authMiddleware = (req, res, next) => {
-    console.log(req.headers)
-    console.log(">>>>>>>> cookis: ", req.headers.cookie)
-    console.log(">>>>>>>> authorization: ", req.headers.authorization)
-    const authHeader = req.headers.cookie
+    const authHeader = req.headers.authorization
 
     // 1) Check if Authorization header is present
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

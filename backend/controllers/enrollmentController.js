@@ -55,9 +55,21 @@ const getStudentCourses = async (req, res) => {
     const userId = req.params.id;
     try {
         const enrollmentQuery = `
-            SELECT *
-            FROM user_course
-            WHERE user_id = $1
+            SELECT
+                uc.user_course_id,
+                c.course_id,
+                c.course_title,
+                c.course_description,
+                c.course_category,
+                c.course_price,
+                c.course_start_date,
+                c.course_img,
+                u.user_first_name AS professor_first_name,
+                u.user_last_name AS professor_last_name
+            FROM user_course uc
+            JOIN courses c ON uc.course_id = c.course_id
+            JOIN users u ON c.course_professor = u.user_id
+            WHERE uc.user_id = $1;
         `;
         const result = await db.query(enrollmentQuery, [userId]);
         res.json({ courses: result.rows });

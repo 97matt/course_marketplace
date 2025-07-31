@@ -7,6 +7,7 @@ const userRoutes = require('./routes/userRoutes')
 const courseRoutes = require('./routes/courseRoutes')
 const enrollmentRoutes = require('./routes/enrollmentRoutes')
 const authMiddleware = require('./middleware/authMiddleware')
+const likeRoutes = require('./routes/likeRoutes')
 
 const cookieParser = require("cookie-parser");
 
@@ -28,6 +29,7 @@ app.use(express.json())      // Parse incoming JSON payloads
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/enroll', enrollmentRoutes);
+app.use('/api/likes', likeRoutes)
 
 app.get('/test-db', async (req, res) => {
     try {

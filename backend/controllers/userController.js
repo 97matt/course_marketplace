@@ -54,7 +54,7 @@ const loginUser = async (req, res) => {
         }
         // 4) Create JWT token
         const tokenPayload = { userId: user.user_id, role: user.user_rol }
-        const token = jwt.sign(tokenPayload, 'process.env.JWT_SECRET', { expiresIn: '2h' })
+        const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '2h' })
         // 5) Return token and basic user info
 
 
@@ -84,6 +84,7 @@ const loginUser = async (req, res) => {
 }
 
 const updateUser = async (req, res) => {
+    const { id } = req.params
     const {
         user_id,
         user_name,
@@ -91,7 +92,7 @@ const updateUser = async (req, res) => {
         user_last_name,
         user_email,
         user_password,
-        user_password_new,
+        new_password,
         user_img
     } = req.body;
 
@@ -107,6 +108,10 @@ const updateUser = async (req, res) => {
 
         // 2. Verificar contraseña actual
         const isValidPassword = await bcrypt.compare(user_password, user.user_password);
+        console.log("Received current password:", user_password);
+        console.log("Actual hash in DB:", user.user_password);
+        console.log("Is valid password:", isValidPassword);
+
 
         if (!isValidPassword) {
             return res.status(401).json({ error: 'Contraseña actual inválida' });
@@ -115,24 +120,24 @@ const updateUser = async (req, res) => {
         // 3. Determinar si se debe actualizar la contraseña
         let hashedPassword = user.user_password; // mantener la actual por defecto
 
-        if (user_password_new && user_password_new.trim() !== '') {
+        if (new_password && new_password.trim() !== '') {
             // hashear la nueva contraseña
             const salt = await bcrypt.genSalt(10);
-            hashedPassword = await bcrypt.hash(user_password_new, salt);
+            hashedPassword = await bcrypt.hash(new_password, salt);
         }
 
         // 4. Ejecutar la actualización
         const updateQuery = `
-      UPDATE users SET
+        UPDATE users SET
         user_name = $1,
         user_first_name = $2,
         user_last_name = $3,
         user_email = $4,
         user_password = $5,
         user_img = $6
-      WHERE user_id = $7
-      RETURNING *;
-    `;
+        WHERE user_id = $7
+        RETURNING *;
+        `;
 
         const values = [
             user_name,
@@ -160,8 +165,22 @@ const updateUser = async (req, res) => {
 
 
 
+//GET /users/me
+const getProfile = async (req, res) => {
+    try {
+        //req.user is set by middleware after checking JWT token
+        res.status(200).json(req.user)
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: 'Error fetching user profile' })
+    }
+}
+
+
+
 module.exports = {
     registerUser,
     loginUser,
     updateUser,
+    getProfile
 }

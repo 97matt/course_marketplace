@@ -1,5 +1,6 @@
 import { useContext, useState, createContext } from "react";
 import { registerRequest, loginRequest } from "../api/users.js";
+import axios from "axios";
 
 export const AuthContext = createContext();
 
@@ -11,36 +12,87 @@ export const useAuth = () => {
     return context;
 };
 
+
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [isAuthenticated, setIsAuthenticated] = useState(false)
+    //load user from localStorage if available
+    const [user, setUser] = useState(() => {
+        const storedUser = localStorage.getItem('user')
+        return storedUser ? JSON.parse(storedUser) : null
+    });
+    
+    // use token presence to determine auth state
+    const [isAuthenticated, setIsAuthenticated] = useState(() => {
+        return !!localStorage.getItem('token')
+    })
 
-    const signup = async (user) => {
+
+    // Sign Up function
+    const signup = async (userData) => {
         try {
-            const res = await registerRequest(user);
-            setUser(res.data);
+            const res = await registerRequest(userData);
+            //Extract user + token de response
+            const user = res.data.user
+            const token = res.data.token
+            //Save a localStorage
+            localStorage.setItem('user', JSON.stringify(user))
+            localStorage.setItem('token, token')
+            //Agregar token global a axios
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+            //Set user en memoria
+            setUser(user)
             setIsAuthenticated(true)
         } catch (error) {
-            console.log("Error en AuthContext.jsx:", error);
+            console.log("Error en AuthContext.jsx (signup):", error);
         }
     };
-    const signin = async (user) => {
+
+
+
+    //Login Function
+    const signin = async (userData) => {
         try {
-            const res = await loginRequest(user);
-            const data = res.data.user
-            setUser(data);
+            const res = await loginRequest(userData)
+            //Extraer user + token
+            const user = res.data.user
+            const token = res.data.token
+            //Guardar ambos
+            localStorage.setItem('user', JSON.stringify(user))
+            localStorage.setItem('token', token)
+            //Set token en axios
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+            //Set user
+            setUser(user)
             setIsAuthenticated(true)
-            return data
+            return user
         } catch (error) {
-            console.log("Error en singin AuthContext.jsx:", error);
+            console.log("Error en AuthContext.jsx (signin):", error)
         }
-    };
+    }
 
-    const logout = () => setUser(null)
 
+
+    //Logout Function
+    const logout = () => {
+        // Limpiar todo
+        localStorage.removeItem('user')
+        localStorage.removeItem('token')
+        setUser(null)
+        setIsAuthenticated(false)
+        //Remove auth header de axios
+        delete axios.defaults.headers.common['Authorization']
+    }
+
+    //Return the context provider
     return (
-        <AuthContext.Provider value={{ signup, user, signin, isAuthenticated, logout, setUser }}>
+        <AuthContext.Provider value={{
+            signup,
+            user,
+            signin,
+            isAuthenticated,
+            logout,
+            setUser
+        }}>
             {children}
         </AuthContext.Provider>
-    );
+    )
 };

@@ -8,13 +8,21 @@ import { getStudentCoursesRequest } from "../api/enroll";
 
 export default function ProfilePage() {
     const { user } = useAuth();
+    if (!user) {
+        return <div>Loading...</div>
+    }
     const [coursesByProfessor, setCoursesByProfessor] = useState([]);
+
+    const handleRemoveCourse = (id) => {
+        setCoursesByProfessor(prev => prev.filter(c => c.course_id !== id))
+    }
 
     useEffect(() => {
         if (user.user_rol === 'professor') {
             const fetchDataProfessor = async () => {
                 try {
                     const res = await coursesByProfessorRequest(user.user_id);
+                    console.log("Profile Page courses:", res.data);
                     setCoursesByProfessor(res.data);
                 } catch (error) {
                     console.error(error);
@@ -84,13 +92,10 @@ export default function ProfilePage() {
                             coursesByProfessor.map((course) => (
                                 <CourseComponent
                                     key={course.course_id}
-                                    id={course.course_id}
-                                    description={course.course_description}
-                                    price={course.course_price}
-                                    title={course.course_title}
-                                    professor_id={course.course_professor}
+                                    course={course}
                                     user_rol={user?.user_rol || ''}
-                                    category={course.course_category}
+                                    user_id={user?.user_id}
+                                    onRemove={handleRemoveCourse} //Instant Remove Course
                                 />
                             )
                             )}

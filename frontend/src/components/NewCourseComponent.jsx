@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { newCourseRequest } from "../api/courses";
 import { useAuth } from "../context/AuthContext";
+import { supabase } from "../supabaseClient";
+
 
 export default function NewCourseComponent() {
     const { user } = useAuth(); // <-- mover arriba
@@ -19,20 +21,49 @@ export default function NewCourseComponent() {
     });
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        const { name, value, files } = e.target;
+
+        if (name === "course_img") {
+            setFormData({ ...formData, [name]: files[0] }); // Store the actual File object
+        } else {
+            setFormData({ ...formData, [name]: value });
+        }
     };
+
 
 
     const handleOnSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            console.log(formData)
-            await newCourseRequest(formData);
+            // 1. Upload image to Supabase
+            const file = formData.course_img;
+            const fileName = `${Date.now()}_${file.name}`;
+
+            console.log("Uploading file:", file);
+
+            const { data, error } = await supabase.storage
+                .from("courses-images")
+                .upload(fileName, file);
+
+            if (error) throw error;
+
+            // 2. Get public URL
+            const { data: urlData } = supabase.storage
+                .from("courses-images")
+                .getPublicUrl(fileName);
+
+            // 3. Add the URL to formData
+            const updatedForm = {
+                ...formData,
+                course_img: urlData.publicUrl,
+            };
+
+            // 4. Submit course with image URL
+            await newCourseRequest(updatedForm);
             navigate("/profile");
         } catch (error) {
-            console.error(error);
+            console.error("Error submitting course:", error.message);
         }
     };
 
