@@ -1,23 +1,42 @@
 export default function FooterComponent() {
     return (
         <footer
-            className="bg-secondary text-white text-center py-2"
-            style={{ fontSize: '0.85rem', position: 'fixed', bottom: 0, left: 0, width: '100%' }}
+            className="text-white text-center py-4"
+            style={{ backgroundColor: "#343a40", fontSize: "0.9rem" }}
         >
             <div className="container d-flex flex-column flex-md-row justify-content-between align-items-center">
-                <div className="mb-1 mb-md-0">
-                    <strong>Contacto:</strong> +56 9 1234 5678 | contacto@ejemplo.com
+
+                <div className="mb-3 mb-md-0 text-md-start">
+                    <h6 className="mb-1 fw-bold">Contáctanos</h6>
+                    <div>Teléfono: +56 9 8456 2371</div>
+                    <div>Email: contacto@miempresa.cl</div>
                 </div>
-                <div className="mb-1 mb-md-0">
-                    <a href="#" className="text-white me-2"><i className="bi bi-facebook"></i></a>
-                    <a href="#" className="text-white me-2"><i className="bi bi-instagram"></i></a>
-                    <a href="#" className="text-white"><i className="bi bi-twitter-x"></i></a>
+
+                <div className="mb-3 mb-md-0">
+                    <h6 className="mb-1 fw-bold">Síguenos en redes sociales</h6>
+                    <a href="https://facebook.com/miempresa" target="_blank" className="text-white me-3" rel="noreferrer">
+                        <i className="bi bi-facebook fs-4"></i>
+                    </a>
+                    <a href="https://instagram.com/miempresa.oficial" target="_blank" className="text-white me-3" rel="noreferrer">
+                        <i className="bi bi-instagram fs-4"></i>
+                    </a>
+                    <a href="https://twitter.com/miempresa_cl" target="_blank" className="text-white me-3" rel="noreferrer">
+                        <i className="bi bi-twitter-x fs-4"></i>
+                    </a>
+                    <a href="https://linkedin.com/company/miempresa" target="_blank" className="text-white" rel="noreferrer">
+                        <i className="bi bi-linkedin fs-4"></i>
+                    </a>
                 </div>
-                <div>
-                    © 2025 Todos los derechos reservados
+
+                <div className="text-md-end">
+                    <h6 className="mb-1 fw-bold">Sobre nosotros</h6>
+                    <p className="mb-1">
+                        En MiEmpresa creemos en la educación accesible, moderna y de calidad.
+                    </p>
+                    <div>© 2025 MiEmpresa. Todos los derechos reservados.</div>
                 </div>
+
             </div>
         </footer>
     );
 }
-

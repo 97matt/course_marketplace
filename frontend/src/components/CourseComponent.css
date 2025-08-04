@@ -1,13 +1,24 @@
-.card-body {
-    height: 300px;
+.course-card {
+    width: 16rem;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s;
 }
 
-.card-body .description {
-    height: 130px;
-
+.course-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
-.card-img-top {
-    width: 100%;
-    height: 170px;
+.course-img {
+    height: 160px;
+    object-fit: cover;
+}
+
+.course-description {
+    line-height: 1.4;
+    max-height: 4.2em;
+    /* aprox 3 lines */
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

@@ -167,7 +167,7 @@ export default function CourseComponent({ course, user_rol = "", onRemove }) {
     };
 
     return (
-        <div className="card shadow-sm mx-2 mt-3" style={{ width: "15rem" }}>
+        <div className="card course-card shadow-sm mx-2 mt-4 border-0" style={{ width: "15rem" }}>
             <img src={course_img} alt={course_title} className="card-img-top" />
             <div className="card-body">
                 <h5 className="card-title d-flex align-items-center">
