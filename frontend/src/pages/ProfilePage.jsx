@@ -18,6 +18,8 @@ export default function ProfilePage() {
     }
 
     useEffect(() => {
+        if (!user || !user.user_id) return
+
         if (user.user_rol === 'professor') {
             const fetchDataProfessor = async () => {
                 try {
@@ -41,7 +43,7 @@ export default function ProfilePage() {
             }
             fetchDataStudent()
         }
-    }, []);
+    }, [user]);
 
     return (
         <>

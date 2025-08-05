@@ -31,6 +31,11 @@ export const AuthProvider = ({ children }) => {
         try {
             const res = await registerRequest(userData);
             console.log("Signup response:", res.data) //Check
+
+            if (!res || !res.data || !res.data.token || !res.data.user) {
+                throw new Error("Incomplete signup response");
+            }
+
             //Extract user + token de response
             const token = res.data.token
             const user = res.data.user || userData //Fallback if user isn't returned
@@ -42,6 +47,9 @@ export const AuthProvider = ({ children }) => {
             //Set user en memoria
             setUser(user)
             setIsAuthenticated(true)
+
+            console.log("✅ Everything went fine. Returning user:", user);
+
             //Return useful data
             return user
         } catch (error) {

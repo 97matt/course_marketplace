@@ -26,11 +26,14 @@ export default function RegisterPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await signup(formData)
-            if (res && res.data) {
-                navigate("/login")
+            const user = await signup(formData)
+            if (user && user.user_id) {
+                setTimeout(() => {
+                    navigate("/profile")
+                }, 200)
+            
             } else {
-                throw new Error("no response data from server.")
+                throw new Error("Usuario no es valido")
             }
         } catch (err) {
             console.log("Signup error:", err);
