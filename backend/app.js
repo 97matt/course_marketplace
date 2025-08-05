@@ -20,9 +20,10 @@ app.use(cookieParser());
 
 // Middleware
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: ['http://localhost:5173', 'https://coursemarketplace.netlify.app'],
     credentials: true
 }));                   // Habilitar CORS para que se comuniquen el front con el back
+
 app.use(morgan('dev'))      // HTTP request logger
 app.use(express.json())      // Parse incoming JSON payloads
 
