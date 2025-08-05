@@ -26,10 +26,14 @@ export default function RegisterPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await signup(formData);
-            navigate("/profile");
+            const res = await signup(formData)
+            if (res && res.data) {
+                navigate("/login")
+            } else {
+                throw new Error("no response data from server.")
+            }
         } catch (err) {
-            console.log(err);
+            console.log("Signup error:", err);
             setError("Error al registrarse. Intenta nuevamente.");
         }
     };

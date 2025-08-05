@@ -30,19 +30,23 @@ export const AuthProvider = ({ children }) => {
     const signup = async (userData) => {
         try {
             const res = await registerRequest(userData);
+            console.log("Signup response:", res.data) //Check
             //Extract user + token de response
-            const user = res.data.user
             const token = res.data.token
+            const user = res.data.user || userData //Fallback if user isn't returned
             //Save a localStorage
             localStorage.setItem('user', JSON.stringify(user))
-            localStorage.setItem('token, token')
+            localStorage.setItem('token', token)
             //Agregar token global a axios
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
             //Set user en memoria
             setUser(user)
             setIsAuthenticated(true)
+            //Return useful data
+            return user
         } catch (error) {
             console.log("Error en AuthContext.jsx (signup):", error);
+            throw error //Front can show error
         }
     };
 

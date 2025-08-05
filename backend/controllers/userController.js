@@ -8,11 +8,6 @@ const registerUser = async (req, res) => {
     const { user_name, user_first_name, user_last_name, user_email, user_password, user_rol, user_img } = req.body
     console.log(user_name, user_first_name, user_last_name, user_email, user_password, user_rol, user_img)
     try {
-        // 1) Validate required fields
-        /*if (!user_name || !user_first_name || !user_last_name || !user_email || !user_password || !user_rol) {
-            return res.status(400).json({ error: 'Missing required fields' })
-        }
-        // 2) Hash the password for security*/
         const hashedPassword = await bcrypt.hash(user_password, 10)
         // 3) Insert the new user into the database
         const query = `
@@ -24,8 +19,22 @@ const registerUser = async (req, res) => {
         `
         const values = [user_name, user_first_name, user_last_name, user_email, hashedPassword, user_rol, user_img]
         const result = await db.query(query, values)
-        // 4) Return the created user details (excluding password)
-        res.status(201).json(result.rows[0])
+
+        const user = result.rows[0]
+        const tokenPayload = { userId: user.user_id, role: user.user_rol }
+        const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '2h' })
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "Lax",
+            maxAge: 1 * 60 * 60 * 1000
+        })
+
+        res.status(201).json({
+            token,
+            user
+        })
     } catch (error) {
         console.error(error)
         res.status(500).json({ error: 'Error registering user' })
