@@ -43,97 +43,96 @@ export default function CoursesPage() {
     const handleRemoveCourse = (id) => {
     }
 
-    return (
-        <>
-            <NavBarComponent />
-            <div className="pt-3 text-center">
-                <h1 className="h2">Nuestros Cursos</h1>
-            </div>
+return (
+			<div className="main-wrapper">
+				<NavBarComponent />
 
-        <div className="container d-flex flex-wrap justify-content-center gap-3 my-4">
-            <select
-                className="form-select"
-                style={{ maxWidth: "200px" }}
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-            >
-                <option value="">Todas las categorías</option>
-                <option value="web_development">Desarrollo Web</option>
-                <option value="programming">Programación</option>
-                <option value="graphic_design">Diseño Gráfico</option>
-                <option value="digital_marketing">Marketing Digital</option>
-                <option value="cybersecurity">Ciberseguridad</option>
-                <option value="data_science">Ciencia de Datos</option>
-                <option value="finance">Finanzas y Contabilidad</option>
-                <option value="languages">Idiomas</option>
-                <option value="photography">Fotografía</option>
-                <option value="music">Música</option>
-                <option value="business">Negocios y Emprendimiento</option>
-                <option value="health">Salud y Bienestar</option>
-                <option value="other">Otros</option>
-                {/* Agrega más según tu base de datos */}
-            </select>
+				<main className="content d-flex flex-column align-items-center w-100 px-3">
+					{/* Title */}
+					<div className="pt-4 text-center">
+						<h1 className="h2">Nuestros Cursos</h1>
+					</div>
 
-            <input
-                type="number"
-                className="form-control"
-                placeholder="Precio mínimo"
-                style={{ maxWidth: "150px" }}
-                value={minPrice}
-                onChange={(e) => setMinPrice(e.target.value)}
-            />
+					{/* Filters */}
+					<div className="d-flex flex-wrap justify-content-center gap-3 my-4" style={{ maxWidth: '900px', width: '100%' }}>
+						<select
+							className="form-select"
+							style={{ maxWidth: "200px" }}
+							value={category}
+							onChange={(e) => setCategory(e.target.value)}
+						>
+							<option value="">Todas las categorías</option>
+							<option value="web_development">Desarrollo Web</option>
+							<option value="programming">Programación</option>
+							<option value="graphic_design">Diseño Gráfico</option>
+							<option value="digital_marketing">Marketing Digital</option>
+							<option value="cybersecurity">Ciberseguridad</option>
+							<option value="data_science">Ciencia de Datos</option>
+							<option value="finance">Finanzas y Contabilidad</option>
+							<option value="languages">Idiomas</option>
+							<option value="photography">Fotografía</option>
+							<option value="music">Música</option>
+							<option value="business">Negocios y Emprendimiento</option>
+							<option value="health">Salud y Bienestar</option>
+							<option value="other">Otros</option>
+						</select>
 
-            <input
-                type="number"
-                className="form-control"
-                placeholder="Precio máximo"
-                style={{ maxWidth: "150px" }}
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(e.target.value)}
-            />
-        </div>
+						<input
+							type="number"
+							className="form-control"
+							placeholder="Precio mínimo"
+							style={{ maxWidth: "150px" }}
+							value={minPrice}
+							onChange={(e) => setMinPrice(e.target.value)}
+						/>
 
-            <div className="container d-flex flex-wrap justify-content-center">
-                {courses.map((course) => (
-                    <CourseComponent
-                        key={course.course_id}
-                        course={course}
-                        user_rol={user?.user_rol || ''}
-                        onRemove={handleRemoveCourse}
-                    />
-                ))}
-            </div>
+						<input
+							type="number"
+							className="form-control"
+							placeholder="Precio máximo"
+							style={{ maxWidth: "150px" }}
+							value={maxPrice}
+							onChange={(e) => setMaxPrice(e.target.value)}
+						/>
+					</div>
 
-            <div className="d-flex justify-content-center my-4">
-                <nav>
-                    <ul className="pagination">
-                        <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
-                            <button className="page-link" onClick={() => setPage(page - 1)}>
-                                Anterior
-                            </button>
-                        </li>
+					{/* Courses */}
+					<div className="d-flex flex-wrap justify-content-center gap-4" style={{ width: '100%', maxWidth: '1200px' }}>
+						{courses.map((course) => (
+							<CourseComponent
+								key={course.course_id}
+								course={course}
+								user_rol={user?.user_rol || ''}
+								onRemove={handleRemoveCourse}
+							/>
+						))}
+					</div>
 
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                            <li
-                                key={pageNum}
-                                className={`page-item ${page === pageNum ? "active" : ""}`}
-                            >
-                                <button className="page-link" onClick={() => setPage(pageNum)}>
-                                    {pageNum}
-                                </button>
-                            </li>
-                        ))}
-                        
-                        <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
-                            <button className="page-link" onClick={() => setPage(page + 1)}>
-                                Siguiente
-                            </button>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+					{/* Pagination */}
+					<div className="d-flex justify-content-center my-4">
+						<nav>
+							<ul className="pagination">
+								<li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+									<button className="page-link" onClick={() => setPage(page - 1)}>Anterior</button>
+								</li>
 
-            <FooterComponent />
-        </>
-    );
+								{Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+									<li key={pageNum} className={`page-item ${page === pageNum ? "active" : ""}`}>
+										<button className="page-link" onClick={() => setPage(pageNum)}>{pageNum}</button>
+									</li>
+								))}
+
+								<li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
+									<button className="page-link" onClick={() => setPage(page + 1)}>Siguiente</button>
+								</li>
+							</ul>
+						</nav>
+					</div>
+				</main>
+
+				<FooterComponent />
+			</div>
+);
+
+
 }
