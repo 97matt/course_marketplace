@@ -15,15 +15,28 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
     //load user from localStorage if available
-    const [user, setUser] = useState(() => {
-        const storedUser = localStorage.getItem('user')
-        return storedUser ? JSON.parse(storedUser) : null
-    });
-    
-    // use token presence to determine auth state
-    const [isAuthenticated, setIsAuthenticated] = useState(() => {
-        return !!localStorage.getItem('token')
-    })
+
+    const [user, setUser] = useState(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    // Only run this logic once on the client
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        const token = localStorage.getItem('token');
+
+        if (storedUser && token) {
+            try {
+                const parsedUser = JSON.parse(storedUser);
+                setUser(parsedUser);
+                setIsAuthenticated(true);
+                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            } catch (err) {
+                console.error("❌ Failed to parse stored user:", err);
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+            }
+        }
+    }, []);
 
 
     // Sign Up function
