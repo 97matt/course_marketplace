@@ -45,8 +45,4 @@ app.get('/', (req, res) => {
     res.send('API is running...')
 })
 
-// Start Server
-const PORT = process.env.PORT || 3000
-app.listen(PORT, () => {
-    console.log(`Server corriendo en puerto ${PORT}`)
-})
+module.exports = app;

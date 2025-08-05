@@ -27,7 +27,7 @@ export default function HomePage() {
     }, [])
 
     return (
-        <>
+        <div className="main-wrapper">
             <NavBarComponent />
             <div className="row align-items-center m-0 p-3 mt-5 rounded" style={{ minHeight: "100%", backgroundColor: "#f8f9fa" }}>
                 <div className="col-12 col-md-3 m-0 p-0">
@@ -73,6 +73,6 @@ export default function HomePage() {
         
 
             <FooterComponent />
-        </>
+        </div>
     )
 }

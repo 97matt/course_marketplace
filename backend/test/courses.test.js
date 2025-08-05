@@ -2,11 +2,26 @@ const app = require('../app');
 const request = require('supertest');
 
 describe('API tests for /api/courses', () => {
+    let token;
+    beforeAll(async () => {
+        const loginRes = await request(app)
+            .post('/api/users/login')
+            .send({
+                user_name: 'profesor',
+                user_password: 'profesor'
+            });
+        token = loginRes.body.token;
+
+        if (!token) {
+            throw new Error('No se pudo obtener el token. Verifica las credenciales.');
+        }
+    });
     it('GET /api/courses should respond with an array', async () => {
         const res = await request(app).get('/api/courses');
         expect(res.statusCode).toBe(200);
         expect(Array.isArray(res.body)).toBe(true);
     });
+
 
     it('GET /api/courses/professor/${id} should respond with an array', async () => {
         const id = 8;
