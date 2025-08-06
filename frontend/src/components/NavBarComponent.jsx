@@ -17,7 +17,7 @@ export default function NavBarComponent() {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-primary shadow fixed-top">
             <div className="container-fluid">
-                <Link to="/" className="navbar-brand"><b>Tu Curso Online</b></Link>
+                <Link to="/" className="navbar-brand"><b>Course Marketplace</b></Link>
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
                 </button>
