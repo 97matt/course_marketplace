@@ -54,7 +54,7 @@ export default function RegisterPage() {
                 <input
                     type="text"
                     className="form-control mb-2"
-                    placeholder="Name"
+                    placeholder="Username"
                     name="user_name"
                     value={formData.user_name}
                     onChange={handleChange}
