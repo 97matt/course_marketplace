@@ -57,15 +57,27 @@ export default function HomePage() {
 
             {/* Render top 3 dynamically once loaded */}
             {topCourses.length === 3 && (
-                <div className="d-flex justify-content-center gap-4 my-4">
-                    <div className="col-md-3">
-                        <CourseComponent course={topCourses[1]} user_rol={user?.user_rol} user_id={user?.user_id} />
+                <div className="row justify-content-center">
+                    <div className="col-12 col-sm-10 col-md-6 col-lg-4 my-3 d-flex justify-content-center">
+                        <CourseComponent
+                            course={topCourses[1]}
+                            user_rol={user?.user_rol}
+                            user_id={user?.user_id}
+                        />
                     </div>
-                    <div className="col-md-3">
-                        <CourseComponent course={topCourses[0]} user_rol={user?.user_rol} user_id={user?.user_id} />
+                    <div className="col-12 col-sm-10 col-md-6 col-lg-4 my-3 d-flex justify-content-center">
+                        <CourseComponent
+                            course={topCourses[0]}
+                            user_rol={user?.user_rol}
+                            user_id={user?.user_id}
+                        />
                     </div>
-                    <div className="col-md-3">
-                        <CourseComponent course={topCourses[2]} user_rol={user?.user_rol} user_id={user?.user_id} />
+                    <div className="col-12 col-sm-10 col-md-6 col-lg-4 my-3 d-flex justify-content-center">
+                        <CourseComponent
+                            course={topCourses[2]}
+                            user_rol={user?.user_rol}
+                            user_id={user?.user_id}
+                        />
                     </div>
                 </div>
             )}
