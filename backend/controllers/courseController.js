@@ -163,7 +163,7 @@ const deleteCourse = async (req, res) => {
         const course = courseResult.rows[0]
 
         // 2) Only the teacher who owns the course can delete it
-        if (course.course_professor != req.user.userId) {
+        if (course.course_professor != req.user.user_id) {
             return res.status(403).json({ error: 'Unauthorized: you can only delete your own courses' })
         }
 
