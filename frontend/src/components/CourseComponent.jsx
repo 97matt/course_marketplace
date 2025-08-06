@@ -166,6 +166,22 @@ export default function CourseComponent({ course, user_rol = "", onRemove }) {
         }
     };
 
+    const categoryTranslations = {
+        web_development: "Desarrollo Web",
+        programming: "Programación",
+        graphic_design: "Diseño Gráfico",
+        digital_marketing: "Marketing Digital",
+        cybersecurity: "Ciberseguridad",
+        data_science: "Ciencia de Datos",
+        finance: "Finanzas y Contabilidad",
+        languages: "Idiomas",
+        photography: "Fotografía",
+        music: "Música",
+        business: "Negocios y Emprendimiento",
+        health: "Salud y Bienestar",
+        other: "Otros",
+    };
+
     return (
         <div className="card course-card shadow-sm mx-2 mt-4 border-0" style={{ width: "15rem" }}>
             <img src={course_img} alt={course_title} className="card-img-top" />
@@ -189,7 +205,9 @@ export default function CourseComponent({ course, user_rol = "", onRemove }) {
                     {course_title}
                 </h5>
                 <div>
-                    <small className="text-danger">{course_category}</small>
+                    <small className="text-danger">
+                        {categoryTranslations[course_category] || course_category}
+                    </small>
                     <p className="mb-1">
                         <span>Inicio: </span>
                         <span className="text-primary">{formattedDate}</span>
