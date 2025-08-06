@@ -12,10 +12,14 @@ export default function NewCoursePage() {
         if (!user) navigate('/home')
     })
     return (
-        <>
+        <div className="d-flex flex-column min-vh-100">
             <NavBarComponent />
-            <NewCoursecomponent />
+
+            <main className="flex-grow-1" style={{ marginTop: "8%" }}>
+                <NewCoursecomponent />
+            </main>
+
             <FooterComponent />
-        </>
+        </div>
     )
 }
