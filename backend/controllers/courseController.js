@@ -162,18 +162,24 @@ const deleteCourse = async (req, res) => {
 
         const course = courseResult.rows[0]
 
+        //Debug logs
+        console.log("🧠 req.user:", req.user);
+        console.log("📘 course.course_professor:", course.course_professor);
+
         // 2) Only the teacher who owns the course can delete it
-        if (course.course_professor != req.user.user_id) {
-            return res.status(403).json({ error: 'Unauthorized: you can only delete your own courses' })
+        if (String(course.course_professor) !== String(req.user.userId)) {
+            console.log("❌ Not authorized to delete this course");
+            return res.status(403).json({ error: 'Unauthorized: you can only delete your own courses' });
         }
 
         // 3) Delete the course
         const deleteQuery = 'DELETE FROM courses WHERE course_id = $1'
         await db.query(deleteQuery, [id])
 
+        console.log("✅ Course deleted successfully");
         res.json({ message: 'Course deleted succesfully' })
     } catch (error) {
-        console.error(error)
+        console.error("🔥 Error deleting course:", error);
         res.status(500).json({ error: 'Error deleting course' })
     }
 }
