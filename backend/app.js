@@ -20,7 +20,13 @@ app.use(cookieParser());
 
 // Middleware
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:5174', 'https://coursemarketplace.netlify.app'],
+    origin: [
+        'http://localhost:5173', 
+        'http://localhost:5174', 
+        'https://coursemarketplace.netlify.app',
+        /\.vercel\.app$/,  // Allow all Vercel preview deployments
+        process.env.FRONTEND_URL  // Allow custom frontend URL from env
+    ].filter(Boolean),
     credentials: true
 }));                   // Habilitar CORS para que se comuniquen el front con el back
 
