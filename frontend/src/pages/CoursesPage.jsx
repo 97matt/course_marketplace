@@ -11,7 +11,6 @@ export default function CoursesPage() {
     const [totalPages, setTotalPages] = useState(1);
     const limit = 3;
 	const [category, setCategory] = useState("");
-	const [minPrice, setMinPrice] = useState("");
 	const [maxPrice, setMaxPrice] = useState("");
 	const [page, setPage] = useState(1);
 	
@@ -20,23 +19,43 @@ export default function CoursesPage() {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const res = await coursesRequest({
-                    category,
-                    min_price: minPrice,
-                    max_price: maxPrice,
+                console.log("🔍 Fetching courses with filters:", { category, maxPrice, page });
+                const params = {
                     page,
-                });
-                setCourses(res.data.courses);
-                setTotalPages(Math.ceil(res.data.total / 3));
-                console.log("📦 Total items:", res.data.total);
-                console.log("📦 Total pages:", Math.ceil(res.data.total / 3));
+                };
+                
+                // Only add category if it's not empty
+                if (category && category !== "") {
+                    params.category = category;
+                }
+                
+                // Only add max_price if it's not empty
+                if (maxPrice && maxPrice !== "") {
+                    params.max_price = maxPrice;
+                }
+                
+                const res = await coursesRequest(params);
+                // Add safety checks for undefined responses
+                if (res && res.data) {
+                    setCourses(res.data.courses || []);
+                    const total = res.data.total || 0;
+                    setTotalPages(Math.ceil(total / 3));
+                    console.log("📦 Total items:", total);
+                    console.log("📦 Total pages:", Math.ceil(total / 3));
+                    console.log("📚 Courses received:", res.data.courses?.length || 0);
+                } else {
+                    setCourses([]);
+                    setTotalPages(1);
+                }
             } catch (error) {
                 console.error("Error fetching filtered courses:", error.message);
+                setCourses([]);
+                setTotalPages(1);
             }
         };
 
 	fetchCourses();
-}, [category, minPrice, maxPrice, page]);
+}, [category, maxPrice, page]);
 
 
     //Removes course from screen after unenroll
@@ -59,7 +78,10 @@ return (
 							className="form-select"
 							style={{ maxWidth: "200px" }}
 							value={category}
-							onChange={(e) => setCategory(e.target.value)}
+							onChange={(e) => {
+								setCategory(e.target.value);
+								setPage(1); // Reset to page 1 when category changes
+							}}
 						>
 							<option value="">Todas las categorías</option>
 							<option value="web_development">Desarrollo Web</option>
@@ -80,32 +102,32 @@ return (
 						<input
 							type="number"
 							className="form-control"
-							placeholder="Precio mínimo"
-							style={{ maxWidth: "150px" }}
-							value={minPrice}
-							onChange={(e) => setMinPrice(e.target.value)}
-						/>
-
-						<input
-							type="number"
-							className="form-control"
 							placeholder="Precio máximo"
 							style={{ maxWidth: "150px" }}
 							value={maxPrice}
-							onChange={(e) => setMaxPrice(e.target.value)}
+							onChange={(e) => {
+								setMaxPrice(e.target.value);
+								setPage(1); // Reset to page 1 when price filter changes
+							}}
 						/>
 					</div>
 
 					{/* Courses */}
 					<div className="d-flex flex-wrap justify-content-center gap-4" style={{ width: '100%', maxWidth: '1200px' }}>
-						{courses.map((course) => (
-							<CourseComponent
-								key={course.course_id}
-								course={course}
-								user_rol={user?.user_rol || ''}
-								onRemove={handleRemoveCourse}
-							/>
-						))}
+						{courses && courses.length > 0 ? (
+							courses.map((course) => (
+								<CourseComponent
+									key={course.course_id}
+									course={course}
+									user_rol={user?.user_rol || ''}
+									onRemove={handleRemoveCourse}
+								/>
+							))
+						) : (
+							<div className="text-center py-5">
+								<p className="text-muted">No se encontraron cursos.</p>
+							</div>
+						)}
 					</div>
 
 					{/* Pagination */}

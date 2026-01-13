@@ -193,7 +193,6 @@ const getFilteredCourses = async (req, res) => {
 
 		const {
 			category,
-			min_price,
 			max_price,
 			page = 1,
 			limit = 3,
@@ -208,11 +207,6 @@ const getFilteredCourses = async (req, res) => {
             values.push(category);
             conditions.push(`LOWER(course_category) = LOWER($${values.length})`);
         }
-
-		if (min_price) {
-			values.push(parseFloat(min_price));
-			conditions.push(`course_price >= $${values.length}`);
-		}
 
 		if (max_price) {
 			values.push(parseFloat(max_price));

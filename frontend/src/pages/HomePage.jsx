@@ -17,9 +17,15 @@ export default function HomePage() {
         const fetchTopCourses = async () => {
             try {
                 const res = await getTopLikedCoursesRequest()
-                setTopCourses(res.data) //Returns 3 courses
+                // Add safety check for undefined responses
+                if (res && res.data) {
+                    setTopCourses(res.data) //Returns 3 courses
+                } else {
+                    setTopCourses([])
+                }
             } catch (error) {
                 console.error("Error fetching top liked courses", error.message)
+                setTopCourses([])
             }
         }
 
@@ -56,7 +62,7 @@ export default function HomePage() {
             </div>
 
             {/* Render top 3 dynamically once loaded */}
-            {topCourses.length === 3 && (
+            {topCourses && topCourses.length >= 3 ? (
                 <div className="row justify-content-center">
                     <div className="col-12 col-sm-10 col-md-6 col-lg-4 my-3 d-flex justify-content-center">
                         <CourseComponent
@@ -79,6 +85,22 @@ export default function HomePage() {
                             user_id={user?.user_id}
                         />
                     </div>
+                </div>
+            ) : topCourses && topCourses.length > 0 ? (
+                <div className="row justify-content-center">
+                    {topCourses.map((course, index) => (
+                        <div key={course.course_id || index} className="col-12 col-sm-10 col-md-6 col-lg-4 my-3 d-flex justify-content-center">
+                            <CourseComponent
+                                course={course}
+                                user_rol={user?.user_rol}
+                                user_id={user?.user_id}
+                            />
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className="text-center py-3">
+                    <p className="text-muted">Cargando cursos populares...</p>
                 </div>
             )}
         </div>

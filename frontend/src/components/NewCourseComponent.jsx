@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { newCourseRequest } from "../api/courses";
 import { useAuth } from "../context/AuthContext";
-import { supabase } from "../supabaseClient";
 
 
 export default function NewCourseComponent() {
@@ -16,18 +15,13 @@ export default function NewCourseComponent() {
         course_description: "",
         course_price: 1,
         course_start_date: "",
-        course_img: null,
+        course_img: "",
         course_category: ""
     });
 
     const handleChange = (e) => {
-        const { name, value, files } = e.target;
-
-        if (name === "course_img") {
-            setFormData({ ...formData, [name]: files[0] }); // Store the actual File object
-        } else {
-            setFormData({ ...formData, [name]: value });
-        }
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
     };
 
 
@@ -36,30 +30,16 @@ export default function NewCourseComponent() {
         e.preventDefault();
 
         try {
-            // 1. Upload image to Supabase
-            const file = formData.course_img;
-            const fileName = `${Date.now()}_${file.name}`;
+            // Use default image URL if no image URL is provided
+            const imageUrl = formData.course_img || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=600&fit=crop";
 
-            console.log("Uploading file:", file);
-
-            const { data, error } = await supabase.storage
-                .from("courses-images")
-                .upload(fileName, file);
-
-            if (error) throw error;
-
-            // 2. Get public URL
-            const { data: urlData } = supabase.storage
-                .from("courses-images")
-                .getPublicUrl(fileName);
-
-            // 3. Add the URL to formData
+            // Prepare form data with image URL
             const updatedForm = {
                 ...formData,
-                course_img: urlData.publicUrl,
+                course_img: imageUrl,
             };
 
-            // 4. Submit course with image URL
+            // Submit course to local backend API
             await newCourseRequest(updatedForm);
             navigate("/profile");
         } catch (error) {
@@ -120,7 +100,7 @@ export default function NewCourseComponent() {
                         <select
                             name="course_category"
                             className="form-select mb-3"
-                            value={formData.course_type}
+                            value={formData.course_category}
                             onChange={handleChange}
                             required
                         >
@@ -143,13 +123,16 @@ export default function NewCourseComponent() {
                     </div>
                     <div className="col-md-6">
                         <input
-                            type="file"
+                            type="url"
                             className="form-control mb-3"
                             name="course_img"
+                            placeholder="URL de la imagen (opcional)"
+                            value={formData.course_img}
                             onChange={handleChange}
-                            accept="image/*"
-                            required
                         />
+                        <small className="text-muted">
+                            Deja vacío para usar imagen por defecto, o ingresa una URL de imagen (ej: Unsplash, Imgur, etc.)
+                        </small>
                     </div>
                 </div>
 
