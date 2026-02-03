@@ -33,6 +33,21 @@ app.use(cors({
 app.use(morgan('dev'))      // HTTP request logger
 app.use(express.json())      // Parse incoming JSON payloads
 
+// Keep-warm and health endpoints (no auth, no DB for /health; minimal DB for /warm)
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'ok' });
+});
+
+app.get('/warm', async (req, res) => {
+    try {
+        await db.query('SELECT 1');
+        res.status(200).json({ status: 'ok' });
+    } catch (err) {
+        console.error('Warm check DB error:', err.message);
+        res.status(503).json({ error: 'Service temporarily unavailable' });
+    }
+});
+
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/enroll', enrollmentRoutes);
